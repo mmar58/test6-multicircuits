@@ -16,6 +16,7 @@
         let circuit = $derived(dashboardStore.circuits.find(c => c.id === circuitId));
         let isSimulating = $state(false);
         let showTruthTable = $state(false);
+        let showToolsMenu = $state(false);
         
         let canvasComponent: any = $state(null);
         
@@ -65,6 +66,8 @@
         }
     </script>
     
+    <svelte:window onclick={() => showToolsMenu = false} />
+    
     <div class="h-screen w-screen flex flex-col overflow-hidden bg-[#0a0a0f]">
         <!-- Top Bar -->
         <header class="h-14 bg-card/80 backdrop-blur-md border-b border-border flex items-center justify-between px-4 z-20 shrink-0">
@@ -92,15 +95,39 @@
                 
                 <div class="h-6 w-px bg-border mx-1"></div>
                 
-                <button onclick={handleExportPng} class="p-2 text-muted-foreground hover:text-cyan-400 rounded-md hover:bg-secondary transition-colors" title="Export PNG">
-                    <Image class="w-5 h-5" />
-                </button>
-                <button onclick={handleExportPdf} class="p-2 text-muted-foreground hover:text-cyan-400 rounded-md hover:bg-secondary transition-colors" title="Export PDF">
-                    <Download class="w-5 h-5" />
-                </button>
-                <button onclick={() => showTruthTable = true} class="p-2 text-muted-foreground hover:text-cyan-400 rounded-md hover:bg-secondary transition-colors {showTruthTable ? 'text-cyan-400 bg-secondary' : ''}" title="Truth Table">
-                    <Table2 class="w-5 h-5" />
-                </button>
+                <div class="relative">
+                    <button 
+                        onclick={(e) => { e.stopPropagation(); showToolsMenu = !showToolsMenu; }} 
+                        class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-secondary rounded-md transition-colors border border-border/50"
+                    >
+                        Tools
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform {showToolsMenu ? 'rotate-180' : ''}"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    
+                    {#if showToolsMenu}
+                        <div class="absolute right-0 mt-2 w-48 bg-card border border-border shadow-xl rounded-md overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-100">
+                            <button 
+                                onclick={() => { showTruthTable = true; showToolsMenu = false; }} 
+                                class="w-full text-left px-4 py-2.5 text-sm hover:bg-secondary/80 hover:text-cyan-400 transition-colors flex items-center gap-2 {showTruthTable ? 'text-cyan-400' : 'text-foreground'}"
+                            >
+                                <Table2 class="w-4 h-4" /> Truth Table
+                            </button>
+                            <div class="h-px w-full bg-border/50"></div>
+                            <button 
+                                onclick={() => { handleExportPng(); showToolsMenu = false; }} 
+                                class="w-full text-left px-4 py-2.5 text-sm hover:bg-secondary/80 hover:text-cyan-400 transition-colors flex items-center gap-2 text-foreground"
+                            >
+                                <Image class="w-4 h-4" /> Export as PNG
+                            </button>
+                            <button 
+                                onclick={() => { handleExportPdf(); showToolsMenu = false; }} 
+                                class="w-full text-left px-4 py-2.5 text-sm hover:bg-secondary/80 hover:text-cyan-400 transition-colors flex items-center gap-2 text-foreground"
+                            >
+                                <Download class="w-4 h-4" /> Print to PDF
+                            </button>
+                        </div>
+                    {/if}
+                </div>
                 <button class="p-2 text-muted-foreground hover:text-foreground rounded-md hover:bg-secondary transition-colors" title="Settings">
                     <Settings class="w-5 h-5" />
                 </button>

@@ -7,8 +7,8 @@ export interface CircuitProject {
 }
 
 export class DashboardState {
-    circuits: CircuitProject[] = [];
-    onlineUsers: any[] = [];
+    circuits: CircuitProject[] = $state([]);
+    onlineUsers: any[] = $state([]);
 }
 
-export const dashboardStore = $state(new DashboardState());
+export const dashboardStore = new DashboardState();

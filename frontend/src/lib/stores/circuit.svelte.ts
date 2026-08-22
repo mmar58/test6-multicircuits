@@ -21,11 +21,11 @@ export interface CursorPosition {
 }
 
 export class CircuitState {
-    id: string | null = null;
-    elements: CircuitElement[] = [];
-    wires: Wire[] = [];
-    cursors: Record<string, CursorPosition> = {};
-    activeUserIds: string[] = [];
+    id: string | null = $state(null);
+    elements: CircuitElement[] = $state([]);
+    wires: Wire[] = $state([]);
+    cursors: Record<string, CursorPosition> = $state({});
+    activeUserIds: string[] = $state([]);
 }
 
-export const circuitStore = $state(new CircuitState());
+export const circuitStore = new CircuitState();

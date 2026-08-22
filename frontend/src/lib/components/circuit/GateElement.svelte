@@ -1,11 +1,13 @@
 <script lang="ts">
     import type { CircuitElement } from "../../stores/circuit.svelte";
     
-    let { element, isSimulating, onmousedown, onclick } = $props<{
+    let { element, isSimulating, isSelected, onmousedown, onclick, oncontextmenu } = $props<{
         element: CircuitElement,
         isSimulating: boolean,
+        isSelected?: boolean,
         onmousedown?: (e: MouseEvent) => void,
-        onclick?: (e: MouseEvent) => void
+        onclick?: (e: MouseEvent) => void,
+        oncontextmenu?: (e: MouseEvent) => void
     }>();
     
     // Gate dimensions
@@ -20,10 +22,11 @@
     class="cursor-move {isSimulating ? 'cursor-pointer' : ''}"
     onmousedown={onmousedown}
     onclick={onclick}
+    oncontextmenu={oncontextmenu}
 >
-    <!-- Highlight when high -->
-    {#if isHigh}
-        <rect x="-5" y="-5" width={width + 10} height={height + 10} rx="8" fill="rgba(34, 197, 94, 0.2)" class="blur-md" />
+    <!-- Highlight when high or selected -->
+    {#if isHigh || isSelected}
+        <rect x="-5" y="-5" width={width + 10} height={height + 10} rx="8" fill={isSelected ? "rgba(34, 211, 238, 0.3)" : "rgba(34, 197, 94, 0.2)"} class="blur-md" />
     {/if}
 
     <!-- Main Body -->
@@ -31,7 +34,7 @@
         x="0" y="0" 
         {width} {height} 
         rx="4" 
-        class="{element.type === 'INPUT' ? 'fill-blue-900/40 stroke-blue-500' : element.type === 'OUTPUT' ? 'fill-purple-900/40 stroke-purple-500' : 'fill-slate-800 stroke-slate-500'} stroke-2 transition-colors duration-200 {isHigh ? 'stroke-green-400 fill-green-900/30' : ''}" 
+        class="{element.type === 'INPUT' ? 'fill-blue-900/40 stroke-blue-500' : element.type === 'OUTPUT' ? 'fill-purple-900/40 stroke-purple-500' : 'fill-slate-800 stroke-slate-500'} stroke-2 transition-colors duration-200 {isHigh ? 'stroke-green-400 fill-green-900/30' : ''} {isSelected ? 'stroke-cyan-400' : ''}" 
     />
     
     <!-- Label -->

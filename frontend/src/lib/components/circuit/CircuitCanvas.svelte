@@ -213,23 +213,94 @@
         }
     }
     
+    // Selection state
+    let selectedElementId = $state<string | null>(null);
+    let selectedWireId = $state<string | null>(null);
+    let contextMenu = $state<{x: number, y: number, type: 'element'|'wire', id: string} | null>(null);
+
+    function selectElement(id: string) {
+        selectedElementId = id;
+        selectedWireId = null;
+        contextMenu = null;
+    }
+    
+    function selectWire(id: string) {
+        selectedWireId = id;
+        selectedElementId = null;
+        contextMenu = null;
+    }
+
+    function clearSelection() {
+        selectedElementId = null;
+        selectedWireId = null;
+        contextMenu = null;
+    }
+
+    function handleContextMenu(e: MouseEvent, type: 'element'|'wire', id: string) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (type === 'element') selectElement(id);
+        else selectWire(id);
+        
+        // Show near mouse pointer
+        contextMenu = { x: e.clientX, y: e.clientY, type, id };
+    }
+
+    async function deleteSelection() {
+        if (selectedElementId) {
+            const id = selectedElementId;
+            circuitStore.elements = circuitStore.elements.filter(e => e.id !== id);
+            // Delete associated wires locally
+            circuitStore.wires = circuitStore.wires.filter(w => w.fromElement !== id && w.toElement !== id);
+            
+            const conn = signalrService.getConnection();
+            if (conn && circuitStore.id) await conn.invoke("RemoveElement", circuitStore.id, id);
+        } else if (selectedWireId) {
+            const id = selectedWireId;
+            circuitStore.wires = circuitStore.wires.filter(w => w.id !== id);
+            
+            const conn = signalrService.getConnection();
+            if (conn && circuitStore.id) await conn.invoke("RemoveWire", circuitStore.id, id);
+        }
+        clearSelection();
+        runSimulation();
+    }
+    
     // React to simulation mode toggle
     $effect(() => {
         if (isSimulating) {
             runSimulation();
+            clearSelection();
         }
     });
 
 </script>
 
+<svelte:window 
+    onclick={() => { contextMenu = null; }} 
+    onkeydown={(e) => {
+        if (!isSimulating && (e.key === 'Delete' || e.key === 'Backspace')) {
+            if (selectedElementId || selectedWireId) deleteSelection();
+        }
+    }}
+/>
+
+<div class="w-full h-full relative" onclick={clearSelection}>
 <svg 
     bind:this={svgElement}
     class="w-full h-full"
+    ondragenter={handleDragOver}
     ondragover={handleDragOver}
     ondrop={handleDrop}
     onmousemove={handleMouseMove}
     onmouseup={handleMouseUp}
     onmouseleave={handleMouseUp}
+    onclick={(e) => {
+        if (e.target === svgElement || (e.target as SVGElement).tagName === 'rect') {
+            clearSelection();
+        }
+    }}
 >
     <!-- Background Grid -->
     <defs>
@@ -240,7 +311,21 @@
     <rect width="100%" height="100%" fill="url(#grid)" />
     
     <!-- Wires -->
-    <WireLayer wires={circuitStore.wires} elements={circuitStore.elements} {isSimulating} />
+    <WireLayer 
+        wires={circuitStore.wires} 
+        elements={circuitStore.elements} 
+        {isSimulating}
+        {selectedWireId}
+        onSelect={(e, id) => {
+            if (!isSimulating) {
+                e.stopPropagation();
+                selectWire(id);
+            }
+        }}
+        onContextMenu={(e, id) => {
+            if (!isSimulating) handleContextMenu(e, 'wire', id);
+        }}
+    />
     
     <!-- Drawing Wire -->
     {#if isWiring && wireStart && wireCurrentPos}
@@ -259,8 +344,15 @@
         <GateElement 
             element={el} 
             {isSimulating} 
-            onmousedown={(e) => handleGateMouseDown(e, el.id)}
+            isSelected={selectedElementId === el.id}
+            onmousedown={(e) => {
+                if (!isSimulating) selectElement(el.id);
+                handleGateMouseDown(e, el.id);
+            }}
             onclick={(e) => handleGateClick(e, el.id)}
+            oncontextmenu={(e) => {
+                if (!isSimulating) handleContextMenu(e, 'element', el.id);
+            }}
         />
         
         <!-- Interactive Pins overlay (transparent but clickable) -->
@@ -291,3 +383,24 @@
         {/if}
     {/each}
 </svg>
+
+<!-- Context Menu / Toolbar -->
+{#if contextMenu && !isSimulating}
+    <div 
+        class="fixed z-50 bg-card border border-border shadow-xl rounded-md overflow-hidden animate-in fade-in zoom-in-95 duration-100"
+        style="left: {contextMenu.x}px; top: {contextMenu.y}px;"
+    >
+        <div class="px-3 py-2 text-xs font-semibold text-muted-foreground bg-secondary/50 border-b border-border">
+            {contextMenu.type === 'element' ? 'Component' : 'Connection'}
+        </div>
+        <button 
+            onclick={() => deleteSelection()}
+            class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-400/10 hover:text-red-300 transition-colors flex items-center gap-2"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+            Delete
+        </button>
+    </div>
+{/if}
+
+</div>

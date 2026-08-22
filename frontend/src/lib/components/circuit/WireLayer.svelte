@@ -1,10 +1,13 @@
 <script lang="ts">
     import type { Wire, CircuitElement } from "../../stores/circuit.svelte";
     
-    let { wires, elements, isSimulating } = $props<{
+    let { wires, elements, isSimulating, selectedWireId, onSelect, onContextMenu } = $props<{
         wires: Wire[],
         elements: CircuitElement[],
-        isSimulating: boolean
+        isSimulating: boolean,
+        selectedWireId?: string | null,
+        onSelect?: (e: MouseEvent, id: string) => void,
+        onContextMenu?: (e: MouseEvent, id: string) => void
     }>();
     
     function getPinCoords(elementId: string, pin: string) {
@@ -43,6 +46,7 @@
     }
     
     function getWireColor(w: Wire) {
+        if (selectedWireId === w.id) return "stroke-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]";
         if (!isSimulating) return "stroke-slate-600";
         const fromEl = elements.find(e => e.id === w.fromElement);
         if (fromEl && fromEl.value === 1) return "stroke-green-400 drop-shadow-[0_0_8px_rgba(74,222,128,0.5)]";
@@ -52,10 +56,21 @@
 
 <g>
     {#each wires as wire (wire.id)}
+        <!-- Hit area (thicker transparent stroke for easier clicking) -->
         <path 
             d={getWirePath(wire)} 
             fill="none" 
-            class="{getWireColor(wire)} stroke-2 transition-all duration-300 pointer-events-stroke hover:stroke-red-500 hover:stroke-[4px] cursor-pointer"
+            stroke="transparent"
+            stroke-width="15"
+            class="cursor-pointer pointer-events-stroke"
+            onclick={(e) => onSelect?.(e, wire.id)}
+            oncontextmenu={(e) => onContextMenu?.(e, wire.id)}
+        />
+        <!-- Visible wire -->
+        <path 
+            d={getWirePath(wire)} 
+            fill="none" 
+            class="{getWireColor(wire)} stroke-2 transition-all duration-300 pointer-events-none"
             data-wire={wire.id}
         />
     {/each}

@@ -62,6 +62,14 @@ public class CircuitHub : Hub
         return circuit;
     }
 
+    public async Task DeleteCircuit(string circuitId)
+    {
+        if (_state.Circuits.TryRemove(circuitId, out _))
+        {
+            await Clients.Group("dashboard").SendAsync("DashboardUpdated", _state.Circuits.Values);
+        }
+    }
+
     // Circuit Editor
     public async Task<CircuitProject?> JoinCircuit(string circuitId)
     {
