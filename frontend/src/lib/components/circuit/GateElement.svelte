@@ -19,7 +19,7 @@
 
 <g 
     transform="translate({element.x}, {element.y})" 
-    class="cursor-move {isSimulating ? 'cursor-pointer' : ''}"
+    class="cursor-move select-none {isSimulating ? 'cursor-pointer' : ''}"
     onmousedown={onmousedown}
     onclick={onclick}
     oncontextmenu={oncontextmenu}

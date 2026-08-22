@@ -48,8 +48,8 @@ export function simulateCircuit(elements: CircuitElement[], wires: Wire[], initi
             outVal = values[currId];
         } else {
             const ins = inputsMap[currId];
-            const inA = ins['A'] || 0;
-            const inB = ins['B'] || 0;
+            const inA = ins['in-A'] || 0;
+            const inB = ins['in-B'] || 0;
             
             switch (el.type) {
                 case "AND": outVal = inA & inB; break;
