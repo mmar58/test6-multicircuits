@@ -1,6 +1,6 @@
 import type { CircuitElement, Wire } from "../stores/circuit.svelte";
 
-export function simulateCircuit(elements: CircuitElement[], wires: Wire[]): Record<string, number> {
+export function simulateCircuit(elements: CircuitElement[], wires: Wire[], initialValues?: Record<string, number>): Record<string, number> {
     const values: Record<string, number> = {};
     const inDegree: Record<string, number> = {};
     const adj: Record<string, { to: string, toPin: string, fromPin: string }[]> = {};
@@ -10,7 +10,7 @@ export function simulateCircuit(elements: CircuitElement[], wires: Wire[]): Reco
         adj[el.id] = [];
         inDegree[el.id] = 0;
         if (el.type === "INPUT") {
-            values[el.id] = el.value || 0;
+            values[el.id] = initialValues && initialValues[el.id] !== undefined ? initialValues[el.id] : (el.value || 0);
         }
     }
     

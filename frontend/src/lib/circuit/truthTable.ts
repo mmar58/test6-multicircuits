@@ -25,12 +25,9 @@ export function generateTruthTable(elements: CircuitElement[], wires: Wire[]): {
             // j=0 is LSB or MSB depending on preference. Let's make j=0 the first input (MSB-like).
             const bit = (i >> (numInputs - 1 - j)) & 1;
             rowInputs[inputs[j].id] = bit;
-            
-            // Temporarily modify the element value for simulation
-            inputs[j].value = bit;
         }
         
-        const simulationResult = simulateCircuit(elements, wires);
+        const simulationResult = simulateCircuit(elements, wires, rowInputs);
         
         const rowOutputs: Record<string, number> = {};
         for (const out of outputs) {
