@@ -1,0 +1,75 @@
+import * as signalR from "@microsoft/signalr";
+import { userStore } from "./stores/user.svelte";
+import { dashboardStore } from "./stores/dashboard.svelte";
+import { circuitStore } from "./stores/circuit.svelte";
+
+class SignalRService {
+    private connection: signalR.HubConnection | null = null;
+    
+    public init() {
+        if (this.connection) return this.connection;
+        
+        this.connection = new signalR.HubConnectionBuilder()
+            .withUrl("http://localhost:5033/circuithub") // Update port as needed
+            .withAutomaticReconnect()
+            .build();
+            
+        this.registerEvents(this.connection);
+        return this.connection;
+    }
+    
+    private registerEvents(connection: signalR.HubConnection) {
+        connection.on("DashboardInit", (circuits, users) => {
+            dashboardStore.circuits = circuits;
+            dashboardStore.onlineUsers = users;
+        });
+        
+        connection.on("DashboardUpdated", (circuits) => {
+            dashboardStore.circuits = circuits;
+        });
+        
+        connection.on("UserJoinedCircuit", (user) => {
+            if (!circuitStore.activeUserIds.includes(user.id)) {
+                circuitStore.activeUserIds.push(user.id);
+            }
+        });
+        
+        connection.on("UserLeftCircuit", (userId) => {
+            circuitStore.activeUserIds = circuitStore.activeUserIds.filter(id => id !== userId);
+            delete circuitStore.cursors[userId];
+        });
+        
+        connection.on("ElementUpdated", (element) => {
+            const index = circuitStore.elements.findIndex(e => e.id === element.id);
+            if (index !== -1) {
+                circuitStore.elements[index] = element;
+            } else {
+                circuitStore.elements.push(element);
+            }
+        });
+        
+        connection.on("ElementRemoved", (elementId) => {
+            circuitStore.elements = circuitStore.elements.filter(e => e.id !== elementId);
+        });
+        
+        connection.on("WireAdded", (wire) => {
+            if (!circuitStore.wires.find(w => w.id === wire.id)) {
+                circuitStore.wires.push(wire);
+            }
+        });
+        
+        connection.on("WireRemoved", (wireId) => {
+            circuitStore.wires = circuitStore.wires.filter(w => w.id !== wireId);
+        });
+        
+        connection.on("CursorMoved", (userId, x, y) => {
+            circuitStore.cursors[userId] = { userId, x, y };
+        });
+    }
+    
+    public getConnection() {
+        return this.connection;
+    }
+}
+
+export const signalrService = new SignalRService();
