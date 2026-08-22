@@ -98,30 +98,30 @@
                 <div class="relative">
                     <button 
                         onclick={(e) => { e.stopPropagation(); showToolsMenu = !showToolsMenu; }} 
-                        class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-secondary rounded-md transition-colors border border-border/50"
+                        class="flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-slate-200 bg-slate-800 hover:bg-slate-700 rounded-md transition-colors border border-slate-700"
                     >
                         Tools
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform {showToolsMenu ? 'rotate-180' : ''}"><path d="m6 9 6 6 6-6"/></svg>
                     </button>
                     
                     {#if showToolsMenu}
-                        <div class="absolute right-0 mt-2 w-48 bg-card border border-border shadow-xl rounded-md overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-100">
+                        <div class="absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-700 shadow-xl rounded-md overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-100">
                             <button 
                                 onclick={() => { showTruthTable = true; showToolsMenu = false; }} 
-                                class="w-full text-left px-4 py-2.5 text-sm hover:bg-secondary/80 hover:text-cyan-400 transition-colors flex items-center gap-2 {showTruthTable ? 'text-cyan-400' : 'text-foreground'}"
+                                class="w-full text-left px-4 py-2.5 text-sm hover:bg-slate-800 hover:text-cyan-400 transition-colors flex items-center gap-2 {showTruthTable ? 'text-cyan-400' : 'text-slate-200'}"
                             >
                                 <Table2 class="w-4 h-4" /> Truth Table
                             </button>
-                            <div class="h-px w-full bg-border/50"></div>
+                            <div class="h-px w-full bg-slate-700"></div>
                             <button 
                                 onclick={() => { handleExportPng(); showToolsMenu = false; }} 
-                                class="w-full text-left px-4 py-2.5 text-sm hover:bg-secondary/80 hover:text-cyan-400 transition-colors flex items-center gap-2 text-foreground"
+                                class="w-full text-left px-4 py-2.5 text-sm hover:bg-slate-800 hover:text-cyan-400 transition-colors flex items-center gap-2 text-slate-200"
                             >
                                 <Image class="w-4 h-4" /> Export as PNG
                             </button>
                             <button 
                                 onclick={() => { handleExportPdf(); showToolsMenu = false; }} 
-                                class="w-full text-left px-4 py-2.5 text-sm hover:bg-secondary/80 hover:text-cyan-400 transition-colors flex items-center gap-2 text-foreground"
+                                class="w-full text-left px-4 py-2.5 text-sm hover:bg-slate-800 hover:text-cyan-400 transition-colors flex items-center gap-2 text-slate-200"
                             >
                                 <Download class="w-4 h-4" /> Print to PDF
                             </button>

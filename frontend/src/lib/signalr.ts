@@ -32,6 +32,9 @@ class SignalRService {
             if (!circuitStore.activeUserIds.includes(user.id)) {
                 circuitStore.activeUserIds.push(user.id);
             }
+            if (!dashboardStore.onlineUsers.find(u => u.id === user.id)) {
+                dashboardStore.onlineUsers.push(user);
+            }
         });
 
         connection.on("UserLeftCircuit", (userId) => {
