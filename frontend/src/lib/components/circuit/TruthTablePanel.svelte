@@ -45,11 +45,11 @@
     <div class="p-4 border-b border-border flex items-center justify-between bg-card/80 backdrop-blur-md">
         <h2 class="font-semibold text-lg flex items-center gap-2">
             Truth Table
-        </h2>
-        <div class="flex items-center gap-2">
-            <button onclick={refreshTable} class="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-cyan-400 transition-colors" title="Refresh Table">
+            <button onclick={refreshTable} class="p-1 rounded-md hover:bg-secondary text-muted-foreground hover:text-cyan-400 transition-colors ml-2" title="Refresh Table">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
             </button>
+        </h2>
+        <div class="flex items-center gap-2">
             <button onclick={exportCsv} class="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-cyan-400 transition-colors" title="Export CSV">
                 <Download class="w-4 h-4" />
             </button>

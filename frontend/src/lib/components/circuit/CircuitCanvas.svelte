@@ -275,6 +275,9 @@
         }
     });
 
+    let sortedInputs = $derived(circuitStore.elements.filter(e => e.type === 'INPUT').sort((a, b) => a.y - b.y));
+    let sortedOutputs = $derived(circuitStore.elements.filter(e => e.type === 'OUTPUT').sort((a, b) => a.y - b.y));
+
 </script>
 
 <svelte:window 
@@ -341,10 +344,12 @@
     
     <!-- Gates -->
     {#each circuitStore.elements as el (el.id)}
+        {@const label = el.type === 'INPUT' ? `In${sortedInputs.findIndex(e => e.id === el.id) + 1}` : el.type === 'OUTPUT' ? `Out${sortedOutputs.findIndex(e => e.id === el.id) + 1}` : undefined}
         <GateElement 
             element={el} 
             {isSimulating} 
             isSelected={selectedElementId === el.id}
+            {label}
             onmousedown={(e) => {
                 if (!isSimulating) selectElement(el.id);
                 handleGateMouseDown(e, el.id);

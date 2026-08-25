@@ -1,13 +1,14 @@
 <script lang="ts">
     import type { CircuitElement } from "../../stores/circuit.svelte";
     
-    let { element, isSimulating, isSelected, onmousedown, onclick, oncontextmenu } = $props<{
+    let { element, isSimulating, isSelected, onmousedown, onclick, oncontextmenu, label } = $props<{
         element: CircuitElement,
         isSimulating: boolean,
         isSelected?: boolean,
         onmousedown?: (e: MouseEvent) => void,
         onclick?: (e: MouseEvent) => void,
-        oncontextmenu?: (e: MouseEvent) => void
+        oncontextmenu?: (e: MouseEvent) => void,
+        label?: string
     }>();
     
     // Gate dimensions
@@ -44,7 +45,7 @@
         text-anchor="middle"
         class="fill-white font-mono text-xs pointer-events-none font-bold"
     >
-        {element.type}
+        {label || element.type}
     </text>
     
     <!-- Input Pins -->

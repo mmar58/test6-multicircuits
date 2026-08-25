@@ -42,8 +42,8 @@ export function generateTruthTable(elements: CircuitElement[], wires: Wire[]): {
     
     return {
         headers: {
-            inputs: inputs.map((_, idx) => `IN ${idx + 1}`),
-            outputs: outputs.map((_, idx) => `OUT ${idx + 1}`)
+            inputs: inputs.map((_, idx) => `In${idx + 1}`),
+            outputs: outputs.map((_, idx) => `Out${idx + 1}`)
         },
         rows
     };
