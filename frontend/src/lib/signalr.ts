@@ -1,5 +1,4 @@
 import * as signalR from "@microsoft/signalr";
-import { userStore } from "./stores/user.svelte";
 import { dashboardStore } from "./stores/dashboard.svelte";
 import { circuitStore } from "./stores/circuit.svelte";
 
@@ -10,7 +9,7 @@ class SignalRService {
         if (this.connection) return this.connection;
 
         this.connection = new signalR.HubConnectionBuilder()
-            .withUrl("http://localhost:5026/circuithub") // Update port as needed
+            .withUrl("https://apimulticircuit.anzdevelopers.com/circuithub") // Update port as needed
             .withAutomaticReconnect()
             .build();
 
@@ -91,7 +90,7 @@ class SignalRService {
      */
     public send(method: string, ...args: unknown[]): void {
         if (this.connection?.state === signalR.HubConnectionState.Connected) {
-            this.connection.invoke(method, ...args).catch(() => {});
+            this.connection.invoke(method, ...args).catch(() => { });
         }
     }
 }

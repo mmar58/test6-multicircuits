@@ -56,6 +56,6 @@ jobs:
             rm -rf frontend
             unzip -o frontend-deploy.zip
             rm frontend-deploy.zip
-            rm -rf /var/www/usermanagement.anzdevelopers.com/*
-            mv frontend/build/* /var/www/usermanagement.anzdevelopers.com/
+            rm -rf /var/www/multicircuit.anzdevelopers.com/*
+            mv frontend/build/* /var/www/multicircuit.anzdevelopers.com/
             sudo systemctl restart nginx

@@ -13,8 +13,6 @@ public static class BonusCircuitGenerator
         var elements = circuit.Elements;
         var wires = circuit.Wires;
         
-        double x = 100, y = 100;
-        
         // Helper to add element
         CircuitElement AddEl(string type, double ex, double ey) {
             var el = new CircuitElement { Id = NextId(), Type = type, X = ex, Y = ey };
