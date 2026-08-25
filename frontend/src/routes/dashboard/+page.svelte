@@ -15,44 +15,25 @@
             goto("/");
             return;
         }
-
-        const conn = signalrService.getConnection();
-        if (conn && conn.state === "Connected") {
-            await conn.invoke("JoinDashboard");
-        }
+        await signalrService.invoke("JoinDashboard");
     });
 
     onDestroy(async () => {
-        const conn = signalrService.getConnection();
-        if (conn && conn.state === "Connected") {
-            try {
-                await conn.invoke("LeaveDashboard");
-            } catch (e) {
-                // Ignore if already disconnected
-            }
+        try {
+            await signalrService.invoke("LeaveDashboard");
+        } catch (e) {
+            // Ignore if already disconnected
         }
     });
 
     async function handleCreateCircuit() {
         if (!newCircuitName.trim()) return;
-
-        const conn = signalrService.getConnection();
-        if (conn) {
-            const circuit = await conn.invoke(
-                "CreateCircuit",
-                newCircuitName,
-                newCircuitDesc,
-                20,
-            );
-            goto(`/circuit/${circuit.id}`);
-        }
+        const circuit = await signalrService.invoke<any>("CreateCircuit", newCircuitName, newCircuitDesc, 20);
+        if (circuit) goto(`/circuit/${circuit.id}`);
     }
 
     function logout() {
-        const conn = signalrService.getConnection();
-        if (conn) {
-            conn.stop();
-        }
+        signalrService.getConnection()?.stop();
         userStore.isJoined = false;
         goto("/");
     }
@@ -207,8 +188,7 @@
                                     onclick={(e) => {
                                         e.stopPropagation();
                                         if (confirm('Are you sure you want to delete this circuit?')) {
-                                            const conn = signalrService.getConnection();
-                                            if (conn) conn.invoke('DeleteCircuit', circuit.id);
+                                            signalrService.send('DeleteCircuit', circuit.id);
                                         }
                                     }}
                                     class="p-2 text-muted-foreground hover:text-red-400 hover:bg-red-400/10 rounded-md transition-colors opacity-0 group-hover:opacity-100"

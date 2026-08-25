@@ -73,6 +73,27 @@ class SignalRService {
     public getConnection() {
         return this.connection;
     }
+
+    /**
+     * Convenience wrapper: invokes a hub method only when the connection is active.
+     * Eliminates the repeated `getConnection() + state === 'Connected'` guard.
+     * Returns null silently if not connected.
+     */
+    public async invoke<T = void>(method: string, ...args: unknown[]): Promise<T | null> {
+        if (this.connection?.state === signalR.HubConnectionState.Connected) {
+            return await this.connection.invoke<T>(method, ...args);
+        }
+        return null;
+    }
+
+    /**
+     * Fire-and-forget variant of invoke — catches errors silently (e.g. cursor updates).
+     */
+    public send(method: string, ...args: unknown[]): void {
+        if (this.connection?.state === signalR.HubConnectionState.Connected) {
+            this.connection.invoke(method, ...args).catch(() => {});
+        }
+    }
 }
 
 export const signalrService = new SignalRService();

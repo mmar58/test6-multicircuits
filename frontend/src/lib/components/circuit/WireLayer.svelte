@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { Wire, CircuitElement } from "../../stores/circuit.svelte";
+    import { GATE_WIDTH, GATE_HEIGHT } from "../../circuit/constants";
     
     let { wires, elements, isSimulating, selectedWireId, onSelect, onContextMenu } = $props<{
         wires: Wire[],
@@ -14,8 +15,8 @@
         const el = elements.find(e => e.id === elementId);
         if (!el) return null;
         
-        const width = 80;
-        const height = 50;
+        const width = GATE_WIDTH;
+        const height = GATE_HEIGHT;
         
         let cx = el.x;
         let cy = el.y;

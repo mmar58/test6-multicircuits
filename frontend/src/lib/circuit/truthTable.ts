@@ -1,5 +1,6 @@
 import type { CircuitElement, Wire } from "../stores/circuit.svelte";
 import { simulateCircuit } from "./engine";
+import { getSortedInputs, getSortedOutputs } from "./helpers";
 
 export interface TruthTableRow {
     inputs: Record<string, number>;
@@ -7,8 +8,8 @@ export interface TruthTableRow {
 }
 
 export function generateTruthTable(elements: CircuitElement[], wires: Wire[]): { headers: { inputs: string[], outputs: string[] }, rows: TruthTableRow[] } {
-    const inputs = elements.filter(e => e.type === "INPUT").sort((a, b) => a.y - b.y);
-    const outputs = elements.filter(e => e.type === "OUTPUT").sort((a, b) => a.y - b.y);
+    const inputs = getSortedInputs(elements);
+    const outputs = getSortedOutputs(elements);
     
     const rows: TruthTableRow[] = [];
     const numInputs = inputs.length;

@@ -36,24 +36,20 @@
         }
 
         circuitStore.id = circuitId;
-        const conn = signalrService.getConnection();
-        if (conn && conn.state === "Connected") {
-            const joinedCircuit = await conn.invoke("JoinCircuit", circuitId);
-            if (!joinedCircuit) {
-                goto("/dashboard");
-                return;
-            }
-            circuitStore.elements = joinedCircuit.elements;
-            circuitStore.wires = joinedCircuit.wires;
-            circuitStore.activeUserIds = joinedCircuit.activeUserIds;
+        const joinedCircuit = await signalrService.invoke<any>("JoinCircuit", circuitId);
+        if (!joinedCircuit) {
+            goto("/dashboard");
+            return;
         }
+        circuitStore.elements = joinedCircuit.elements;
+        circuitStore.wires = joinedCircuit.wires;
+        circuitStore.activeUserIds = joinedCircuit.activeUserIds;
     });
 
     onDestroy(async () => {
-        const conn = signalrService.getConnection();
-        if (conn && conn.state === "Connected" && circuitStore.id) {
+        if (circuitStore.id) {
             try {
-                await conn.invoke("LeaveCircuit", circuitStore.id);
+                await signalrService.invoke("LeaveCircuit", circuitStore.id);
             } catch (e) {}
         }
         circuitStore.id = null;

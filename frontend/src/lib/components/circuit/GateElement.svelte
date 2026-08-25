@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { CircuitElement } from "../../stores/circuit.svelte";
+    import { GATE_WIDTH, GATE_HEIGHT } from "../../circuit/constants";
     
     let { element, isSimulating, isSelected, onmousedown, onclick, oncontextmenu, label } = $props<{
         element: CircuitElement,
@@ -11,9 +12,9 @@
         label?: string
     }>();
     
-    // Gate dimensions
-    const width = 80;
-    const height = 50;
+    // Gate dimensions (shared constants — see circuit/constants.ts)
+    const width = GATE_WIDTH;
+    const height = GATE_HEIGHT;
     
     const isHigh = $derived(isSimulating && element.value === 1);
 </script>

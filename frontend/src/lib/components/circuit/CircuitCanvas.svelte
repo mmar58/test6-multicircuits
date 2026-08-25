@@ -3,6 +3,8 @@
     import { circuitStore } from "../../stores/circuit.svelte";
     import { signalrService } from "../../signalr";
     import { simulateCircuit } from "../../circuit/engine";
+    import { GATE_WIDTH, GATE_HEIGHT } from "../../circuit/constants";
+    import { getSortedInputs, getSortedOutputs, getElementLabel } from "../../circuit/helpers";
     import GateElement from "./GateElement.svelte";
     import WireLayer from "./WireLayer.svelte";
     import { dashboardStore } from "$lib/stores/dashboard.svelte";
@@ -63,12 +65,7 @@
         };
         
         circuitStore.elements.push(newEl);
-        
-        const conn = signalrService.getConnection();
-        if (conn && circuitStore.id) {
-            await conn.invoke("UpdateElement", circuitStore.id, newEl);
-        }
-        
+        await signalrService.invoke("UpdateElement", circuitStore.id, newEl);
         runSimulation();
     }
     
@@ -90,13 +87,8 @@
         const el = circuitStore.elements.find(e => e.id === elId);
         if (el && el.type === "INPUT") {
             el.value = el.value === 1 ? 0 : 1;
-            
             runSimulation();
-            
-            const conn = signalrService.getConnection();
-            if (conn && circuitStore.id) {
-                await conn.invoke("UpdateElement", circuitStore.id, el);
-            }
+            await signalrService.invoke("UpdateElement", circuitStore.id, el);
         }
     }
     
@@ -123,12 +115,7 @@
             };
             
             circuitStore.wires.push(newWire);
-            
-            const conn = signalrService.getConnection();
-            if (conn && circuitStore.id) {
-                await conn.invoke("AddWire", circuitStore.id, newWire);
-            }
-            
+            await signalrService.invoke("AddWire", circuitStore.id, newWire);
             runSimulation();
         }
         
@@ -160,10 +147,7 @@
         // Broadcast cursor (throttled)
         const now = Date.now();
         if (now - lastCursorUpdate > 100) {
-            const conn = signalrService.getConnection();
-            if (conn && circuitStore.id) {
-                conn.invoke("UpdateCursor", circuitStore.id, coords.x, coords.y).catch(()=>{});
-            }
+            signalrService.send("UpdateCursor", circuitStore.id, coords.x, coords.y);
             lastCursorUpdate = now;
         }
     }
@@ -172,10 +156,7 @@
         if (isDragging && dragElementId) {
             const el = circuitStore.elements.find(e => e.id === dragElementId);
             if (el) {
-                const conn = signalrService.getConnection();
-                if (conn && circuitStore.id) {
-                    await conn.invoke("UpdateElement", circuitStore.id, el);
-                }
+                await signalrService.invoke("UpdateElement", circuitStore.id, el);
             }
         }
         
@@ -191,11 +172,7 @@
         if (isSimulating) return;
         
         circuitStore.wires = circuitStore.wires.filter(w => w.id !== wireId);
-        
-        const conn = signalrService.getConnection();
-        if (conn && circuitStore.id) {
-            await conn.invoke("RemoveWire", circuitStore.id, wireId);
-        }
+        await signalrService.invoke("RemoveWire", circuitStore.id, wireId);
         runSimulation();
     }
     
@@ -253,15 +230,11 @@
             circuitStore.elements = circuitStore.elements.filter(e => e.id !== id);
             // Delete associated wires locally
             circuitStore.wires = circuitStore.wires.filter(w => w.fromElement !== id && w.toElement !== id);
-            
-            const conn = signalrService.getConnection();
-            if (conn && circuitStore.id) await conn.invoke("RemoveElement", circuitStore.id, id);
+            await signalrService.invoke("RemoveElement", circuitStore.id, id);
         } else if (selectedWireId) {
             const id = selectedWireId;
             circuitStore.wires = circuitStore.wires.filter(w => w.id !== id);
-            
-            const conn = signalrService.getConnection();
-            if (conn && circuitStore.id) await conn.invoke("RemoveWire", circuitStore.id, id);
+            await signalrService.invoke("RemoveWire", circuitStore.id, id);
         }
         clearSelection();
         runSimulation();
@@ -274,9 +247,6 @@
             clearSelection();
         }
     });
-
-    let sortedInputs = $derived(circuitStore.elements.filter(e => e.type === 'INPUT').sort((a, b) => a.y - b.y));
-    let sortedOutputs = $derived(circuitStore.elements.filter(e => e.type === 'OUTPUT').sort((a, b) => a.y - b.y));
 
 </script>
 
@@ -335,7 +305,7 @@
         {@const startEl = circuitStore.elements.find(e => e.id === wireStart?.el)}
         {#if startEl}
             <path 
-                d="M {startEl.x + 80} {startEl.y + 25} C {startEl.x + 80 + Math.abs(wireCurrentPos.x - startEl.x - 80)*0.5} {startEl.y + 25}, {wireCurrentPos.x - Math.abs(wireCurrentPos.x - startEl.x - 80)*0.5} {wireCurrentPos.y}, {wireCurrentPos.x} {wireCurrentPos.y}" 
+                d="M {startEl.x + GATE_WIDTH} {startEl.y + GATE_HEIGHT / 2} C {startEl.x + GATE_WIDTH + Math.abs(wireCurrentPos.x - startEl.x - GATE_WIDTH)*0.5} {startEl.y + GATE_HEIGHT / 2}, {wireCurrentPos.x - Math.abs(wireCurrentPos.x - startEl.x - GATE_WIDTH)*0.5} {wireCurrentPos.y}, {wireCurrentPos.x} {wireCurrentPos.y}" 
                 fill="none" 
                 class="stroke-cyan-500 stroke-2 border-dashed opacity-50"
             />
@@ -344,7 +314,7 @@
     
     <!-- Gates -->
     {#each circuitStore.elements as el (el.id)}
-        {@const label = el.type === 'INPUT' ? `In${sortedInputs.findIndex(e => e.id === el.id) + 1}` : el.type === 'OUTPUT' ? `Out${sortedOutputs.findIndex(e => e.id === el.id) + 1}` : undefined}
+        {@const label = getElementLabel(el, circuitStore.elements)}
         <GateElement 
             element={el} 
             {isSimulating} 
