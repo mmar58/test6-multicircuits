@@ -42,18 +42,19 @@
 </script>
 
 <div class="absolute top-0 right-0 h-full w-96 bg-card border-l border-border shadow-2xl flex flex-col z-30 animate-in slide-in-from-right duration-300">
-    <div class="p-4 border-b border-border flex items-center justify-between bg-card/80 backdrop-blur-md">
-        <h2 class="font-semibold text-lg flex items-center gap-2">
-            Truth Table
-            <button onclick={refreshTable} class="p-1 rounded-md hover:bg-secondary text-muted-foreground hover:text-cyan-400 transition-colors ml-2" title="Refresh Table">
+    <div class="relative p-4 border-b border-border flex items-center justify-between bg-card/80 backdrop-blur-md">
+        <div></div>
+        <div class="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
+            <h2 class="font-semibold text-lg text-white">Truth Table</h2>
+            <button onclick={refreshTable} class="p-1 rounded-md hover:bg-secondary text-white hover:text-green-400 transition-colors" title="Refresh Table">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
             </button>
-        </h2>
-        <div class="flex items-center gap-2">
-            <button onclick={exportCsv} class="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-cyan-400 transition-colors" title="Export CSV">
+        </div>
+        <div class="flex items-center gap-2 relative z-10">
+            <button onclick={exportCsv} class="p-1.5 rounded-md hover:bg-secondary text-gray-300 hover:text-cyan-400 transition-colors" title="Export CSV">
                 <Download class="w-4 h-4" />
             </button>
-            <button onclick={onClose} class="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
+            <button onclick={onClose} class="p-1.5 rounded-md hover:bg-secondary text-gray-300 hover:text-white transition-colors">
                 <X class="w-4 h-4" />
             </button>
         </div>
@@ -76,7 +77,7 @@
                     <thead class="bg-secondary/50 text-muted-foreground text-xs uppercase">
                         <tr>
                             {#each tableData.headers.inputs as header}
-                                <th class="px-3 py-2 border-b border-r border-border font-medium">{header}</th>
+                                <th class="px-3 py-2 border-b border-r border-border font-medium text-green-400">{header}</th>
                             {/each}
                             {#each tableData.headers.outputs as header}
                                 <th class="px-3 py-2 border-b border-r last:border-r-0 border-border font-medium text-cyan-400/80">{header}</th>
