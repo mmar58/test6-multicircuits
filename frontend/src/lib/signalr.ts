@@ -9,7 +9,7 @@ class SignalRService {
         if (this.connection) return this.connection;
 
         this.connection = new signalR.HubConnectionBuilder()
-            .withUrl("https://apimulticircuit.anzdevelopers.com/circuithub") // Update port as needed
+            .withUrl("https://apilogicflow.anzdevelopers.com/circuithub") // Update port as needed
             .withAutomaticReconnect()
             .build();
 
