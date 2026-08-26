@@ -7,13 +7,13 @@
     import { circuitStore } from "$lib/stores/circuit.svelte";
     import { dashboardStore } from "$lib/stores/dashboard.svelte";
     import {
-        ArrowLeft,
         Settings,
         Play,
         Download,
         Table2,
         Image,
     } from "@lucide/svelte";
+    import AppLogo from "$lib/components/AppLogo.svelte";
     import CircuitCanvas from "$lib/components/circuit/CircuitCanvas.svelte";
     import GatePalette from "$lib/components/circuit/GatePalette.svelte";
     import TruthTablePanel from "$lib/components/circuit/TruthTablePanel.svelte";
@@ -85,12 +85,10 @@
         class="h-14 bg-card/80 backdrop-blur-md border-b border-border flex items-center justify-between px-4 z-40 shrink-0"
     >
         <div class="flex items-center gap-4">
-            <button
-                onclick={() => goto("/dashboard")}
-                class="text-muted-foreground hover:text-foreground p-2 rounded-md hover:bg-secondary transition-colors"
-            >
-                <ArrowLeft class="w-5 h-5" />
-            </button>
+            <AppLogo onclick={() => goto("/dashboard")} />
+            
+            <div class="h-6 w-px bg-border hidden sm:block"></div>
+
             <div>
                 <h1 class="font-semibold tracking-tight leading-tight">
                     {circuit?.name || "Loading..."}

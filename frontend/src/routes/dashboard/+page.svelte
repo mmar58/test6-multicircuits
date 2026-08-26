@@ -5,6 +5,7 @@
     import { dashboardStore } from "$lib/stores/dashboard.svelte";
     import { userStore } from "$lib/stores/user.svelte";
     import { LogOut, Plus, Search, CircuitBoard } from "@lucide/svelte";
+    import AppLogo from "$lib/components/AppLogo.svelte";
 
     let isCreating = $state(false);
     let newCircuitName = $state("");
@@ -47,12 +48,7 @@
         <div
             class="container mx-auto px-4 h-16 flex items-center justify-between"
         >
-            <div class="flex items-center gap-2 text-cyan-400">
-                <CircuitBoard class="w-6 h-6" />
-                <span class="font-bold text-xl tracking-tight text-foreground"
-                    >LogicFlow</span
-                >
-            </div>
+            <AppLogo />
 
             <div class="flex items-center gap-4">
                 <div
